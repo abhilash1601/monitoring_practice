@@ -63,12 +63,16 @@ Prometheus runs at:
 Check scrape targets:
 👉 [http://localhost:9090/targets](http://localhost:9090/targets)
 
-You should see:
+You should see :
 
 * Python app
 * cAdvisor
 * Node Exporter
-* Blackbox Exporter
+
+
+  for list of metrics
+  http://localhost:8080/metrics
+  http://localhost:9090/metrics
 
 ---
 
