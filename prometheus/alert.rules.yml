@@ -1,0 +1,42 @@
+groups:
+- name: demo.rules
+  rules:
+  - alert: DemoOrderSpike
+    expr: increase(order_created_total[5m]) > 50
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Order creation spike (>50 in 5m)"
+
+  - alert: DemoHighOrderLatency
+    expr: histogram_quantile(0.95, sum(rate(order_processing_seconds_bucket[5m])) by (le)) > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High order processing latency (95th > 1s)"
+
+  - alert: NodeExporterDown
+    expr: up{job="node_exporter"} == 0
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "node_exporter is down"
+
+  - alert: ContainerHighCPU
+    expr: sum by (container_name) (rate(container_cpu_usage_seconds_total[5m])) * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container {{ $labels.container_name }} CPU > 80% (of single core) for 5m"
+
+  - alert: ContainerHighMemory
+    expr: sum by (container_name) (container_memory_working_set_bytes) > 500 * 1024 * 1024
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container {{ $labels.container_name }} using > 500MiB memory"

@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+scrape_configs:
+  # demo python app metrics
+  - job_name: 'demo-python'
+    static_configs:
+      - targets: ['demo-python:8000']
+
+  # node exporter (host/VM metrics)
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # cAdvisor - container-level metrics
+  - job_name: 'cadvisor'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # blackbox exporter for https probe
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [https_2xx]
+    static_configs:
+      - targets: ['https://example.com']   # replace with your actual external URL(s)
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  # (Optional) windows_exporter when you run it on the host (Windows only)
+  # - job_name: 'windows_exporter'
+  #   static_configs:
+  #     - targets: ['host.docker.internal:9182']
